@@ -1,4 +1,3 @@
-#views.py
 import requests
 import json
 from django.http import JsonResponse
@@ -16,7 +15,7 @@ def generate_ai_response(user_input):
     }
 
     try:
-        response = requests.post(AI_API_URL, json=data)
+        response = requests.post(AI_API_URL, json=data, stream=True)
 
         if response.status_code == 200:
             generated_text = ""
@@ -38,17 +37,12 @@ def home(request):
 
 @csrf_exempt
 def generate_article(request):
-    """ API Endpoint to interact with AI Chatbot """
+    """ API to handle user input and return generated article """
     if request.method == "POST":
         user_input = request.POST.get('title', '')
-        if not user_input:
-            return JsonResponse({"error": "No prompt provided"}, status=400)
-        
         generated_content = generate_ai_response(user_input)
-        return JsonResponse({"response": generated_content})
-
+        return JsonResponse({"article": generated_content})
     return JsonResponse({"error": "Invalid request"}, status=400)
-
 
 @csrf_exempt
 def save_article(request):
